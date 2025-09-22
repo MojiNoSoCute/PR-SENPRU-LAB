@@ -43,8 +43,8 @@
             font-size: 48px;
             background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            color: rgba(255,255,255,0.95);
-            box-shadow: 0 8px 20px rgba(15,23,42,0.12);
+            color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         .hero-title {
@@ -170,12 +170,14 @@
 
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio */
             height: 0;
             overflow: hidden;
             border-radius: 10px;
             background-color: #f8f9fa;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
         }
 
         .video-container iframe {
@@ -186,30 +188,60 @@
             height: 100%;
             border: none;
             border-radius: 10px;
+            transition: opacity 0.3s ease;
         }
 
-        .video-container::before {
-            content: '';
+        @media (max-width: 768px) {
+            .video-container {
+                margin: 0 -15px 1rem -15px;
+                border-radius: 0;
+            }
+
+            .video-container iframe {
+                border-radius: 0;
+            }
+        }
+
+
+
+        .video-fallback {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border: 4px solid #6c5ce7;
-            border-top: 4px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6c5ce7 0%, #5f3dc4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
         }
 
-        .video-container iframe:not([src*="about:blank"]) + ::before {
-            display: none;
+        .fallback-content {
+            padding: 20px;
         }
 
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        .video-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .video-fallback h4 {
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .video-fallback p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .video-fallback a {
+            color: #ffd32a;
+            text-decoration: underline;
         }
 
         .activity-date {
@@ -260,12 +292,12 @@
                 </div>
                 <div class="col-md-4 text-end">
                     @auth
-                        <form method="POST" action="{{ route('logout') }}" style="display:inline">
-                            @csrf
-                            <button class="auth-btn secondary" type="submit">Logout</button>
-                        </form>
+                    <form method="POST" action="{{ route('logout') }}" style="display:inline">
+                        @csrf
+                        <button class="auth-btn secondary" type="submit">Logout</button>
+                    </form>
                     @else
-                        <a class="auth-btn" href="{{ route('login') }}">Login</a>
+                    <a class="auth-btn" href="{{ route('login') }}">Login</a>
                     @endauth
                 </div>
             </div>
@@ -284,11 +316,11 @@
                     <div style="display:flex;gap:10px;flex-wrap:wrap">
                         <button class="btn btn-guide">คู่มือหลักสูตร</button>
                         @auth
-                            <a href="{{ route('program.edit') }}" class="btn btn-guide" style="background:rgba(255,255,255,0.12);color:#fff">แก้ไขหลักสูตร</a>
+                        <a href="{{ route('program.edit') }}" class="btn btn-guide" style="background:rgba(255,255,255,0.12);color:#fff">แก้ไขหลักสูตร</a>
                         @endauth
                     </div>
                     @if(isset($updatedAt))
-                        <div style="margin-top:12px;color:rgba(255,255,255,0.9)">อัปเดตล่าสุด: {{ $updatedAt->format('Y-m-d H:i') }}</div>
+                    <div style="margin-top:12px;color:rgba(255,255,255,0.9)">อัปเดตล่าสุด: {{ $updatedAt->format('Y-m-d H:i') }}</div>
                     @endif
                 </div>
             </div>
@@ -351,15 +383,24 @@
             <h2 class="section-title">วิดีโอแนะนำหลักสูตร</h2>
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <div class="video-container">
-                        <iframe 
-                            src="{{ $featuredVideo->url }}?autoplay=0&mute=0&controls=1&showinfo=1&rel=0" 
-                            frameborder="0" 
+                    <div class="video-container" id="video-container">
+                        <iframe
+                            src="{{ $featuredVideo->url }}?autoplay=0&mute=0&controls=1&showinfo=1&rel=0&modestbranding=1&fs=1"
+                            frameborder="0"
                             allowfullscreen
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             loading="lazy"
                             title="{{ $featuredVideo->title_th }}"
-                        ></iframe>
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            sandbox="allow-scripts allow-same-origin allow-presentation"
+                            onerror="handleVideoError()"></iframe>
+                        <div class="video-fallback" id="video-fallback" style="display: none;">
+                            <div class="fallback-content">
+                                <i class="video-icon">🎥</i>
+                                <h4>ไม่สามารถโหลดวิดีโอได้</h4>
+                                <p>กรุณาดูวิดีโอได้ที่ <a href="{{ preg_replace('/\/embed\/([^?]+)/', '/watch?v=$1', $featuredVideo->url) }}" target="_blank" rel="noopener">YouTube</a></p>
+                            </div>
+                        </div>
                     </div>
                     <h3 class="mt-3">{{ $featuredVideo->title_th }}</h3>
                     <p>{{ $featuredVideo->description_th }}</p>
@@ -403,7 +444,7 @@
                 </div>
                 @endforeach
             </div>
-            
+
             @if($facultyMembers->first() && $facultyMembers->first()->research->count() > 0)
             <div class="row mt-5">
                 <div class="col-lg-8 mx-auto">
@@ -452,9 +493,9 @@
                     <div class="info-card">
                         <div class="activity-date">
                             @if($activity->activity_date)
-                                {{ $activity->activity_date->format('d/m/Y') }}
+                            {{ $activity->activity_date->format('d/m/Y') }}
                             @else
-                                ไม่ระบุวันที่
+                            ไม่ระบุวันที่
                             @endif
                         </div>
                         <h3 class="info-title">{{ $activity->title_th }}</h3>
@@ -510,6 +551,68 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleVideoError() {
+            console.log('Video failed to load, showing fallback');
+            const fallback = document.getElementById('video-fallback');
+            const iframe = document.querySelector('#video-container iframe');
+            if (fallback) {
+                fallback.style.display = 'flex';
+            }
+            if (iframe) {
+                iframe.style.display = 'none';
+            }
+        }
+
+        function handleVideoLoad() {
+            console.log('Video loaded successfully');
+            const fallback = document.getElementById('video-fallback');
+            if (fallback) {
+                fallback.style.display = 'none';
+            }
+        }
+
+        // Enhanced video loading check
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframe = document.querySelector('#video-container iframe');
+            if (iframe) {
+                let hasLoaded = false;
+
+                // Handle successful load
+                iframe.addEventListener('load', function() {
+                    hasLoaded = true;
+                    handleVideoLoad();
+                });
+
+                // Handle load error  
+                iframe.addEventListener('error', function() {
+                    console.log('Iframe error event triggered');
+                    handleVideoError();
+                });
+
+                // Fallback timeout - if video hasn't loaded in 10 seconds
+                setTimeout(function() {
+                    if (!hasLoaded) {
+                        console.log('Video load timeout, showing fallback');
+                        handleVideoError();
+                    }
+                }, 10000);
+
+                // Additional check for blocked iframes
+                setTimeout(function() {
+                    try {
+                        const rect = iframe.getBoundingClientRect();
+                        if (rect.height === 0 || rect.width === 0) {
+                            console.log('Video iframe has no dimensions, likely blocked');
+                            handleVideoError();
+                        }
+                    } catch (e) {
+                        console.log('Error checking iframe dimensions:', e);
+                    }
+                }, 5000);
+            }
+        });
+    </script>
 </body>
 
 </html>
