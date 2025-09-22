@@ -170,10 +170,12 @@
 
         .video-container {
             position: relative;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
             height: 0;
             overflow: hidden;
             border-radius: 10px;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .video-container iframe {
@@ -182,6 +184,32 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 4px solid #6c5ce7;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1;
+        }
+
+        .video-container iframe:not([src*="about:blank"]) + ::before {
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .activity-date {
@@ -324,7 +352,14 @@
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     <div class="video-container">
-                        <iframe src="{{ $featuredVideo->url }}" frameborder="0" allowfullscreen></iframe>
+                        <iframe 
+                            src="{{ $featuredVideo->url }}?autoplay=0&mute=0&controls=1&showinfo=1&rel=0" 
+                            frameborder="0" 
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            loading="lazy"
+                            title="{{ $featuredVideo->title_th }}"
+                        ></iframe>
                     </div>
                     <h3 class="mt-3">{{ $featuredVideo->title_th }}</h3>
                     <p>{{ $featuredVideo->description_th }}</p>

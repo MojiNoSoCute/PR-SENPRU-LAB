@@ -29,7 +29,7 @@ class VideoSeeder extends Seeder
                     'title_th' => 'กิจกรรมของนักศึกษา',
                     'title_en' => 'Student Activities',
                     'description_th' => 'วิดีโอสรุปกิจกรรมของนักศึกษาในคณะวิศวกรรมซอฟต์แวร์',
-                    'url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                    'url' => 'https://www.youtube.com/embed/jNQXAC9IVRw',
                     'is_featured' => false
                 ]
             ]);
