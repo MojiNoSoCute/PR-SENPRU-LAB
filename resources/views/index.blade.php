@@ -138,6 +138,88 @@
         .info-value {
             color: #6c757d;
         }
+
+        .faculty-card {
+            text-align: center;
+        }
+
+        .faculty-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #6c757d;
+        }
+
+        .faculty-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .faculty-position {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .activity-date {
+            background-color: #6c5ce7;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .research-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .research-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .research-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .research-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .research-description {
+            color: #495057;
+        }
     </style>
 </head>
 
@@ -234,6 +316,163 @@
             </div>
         </div>
     </section>
+
+    @if($featuredVideo)
+    <section class="content-section" style="background-color: #fff">
+        <div class="container">
+            <h2 class="section-title">วิดีโอแนะนำหลักสูตร</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="video-container">
+                        <iframe src="{{ $featuredVideo->url }}" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <h3 class="mt-3">{{ $featuredVideo->title_th }}</h3>
+                    <p>{{ $featuredVideo->description_th }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if($careerOpportunities->count() > 0)
+    <section class="content-section">
+        <div class="container">
+            <h2 class="section-title">อาชีพหลังสำเร็จการศึกษา</h2>
+            <div class="row g-4">
+                @foreach($careerOpportunities as $opportunity)
+                <div class="col-lg-4">
+                    <div class="info-card">
+                        <h3 class="info-title">{{ $opportunity->title_th }}</h3>
+                        <p>{{ $opportunity->description_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if($facultyMembers->count() > 0)
+    <section class="content-section" style="background-color: #fff">
+        <div class="container">
+            <h2 class="section-title">อาจารย์ประจำหลักสูตร</h2>
+            <div class="row g-4">
+                @foreach($facultyMembers as $faculty)
+                <div class="col-lg-4">
+                    <div class="info-card faculty-card">
+                        <div class="faculty-img">👤</div>
+                        <div class="faculty-name">{{ $faculty->name_th }}</div>
+                        <div class="faculty-position">{{ $faculty->position_th }}</div>
+                        <p>{{ $faculty->biography_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            @if($facultyMembers->first() && $facultyMembers->first()->research->count() > 0)
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto">
+                    <h3 class="section-title">ผลงานวิจัยของอาจารย์</h3>
+                    @foreach($facultyMembers->first()->research as $research)
+                    <div class="research-item">
+                        <div class="research-title">{{ $research->title_th }}</div>
+                        @if($research->publication_date)
+                        <div class="research-date">เผยแพร่เมื่อ: {{ $research->publication_date->format('d/m/Y') }}</div>
+                        @endif
+                        <div class="research-description">{{ $research->description_th }}</div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        </div>
+    </section>
+    @endif
+
+    @if($laboratories->count() > 0)
+    <section class="content-section">
+        <div class="container">
+            <h2 class="section-title">ห้องปฏิบัติการ</h2>
+            <div class="row g-4">
+                @foreach($laboratories as $lab)
+                <div class="col-lg-6">
+                    <div class="info-card">
+                        <h3 class="info-title">{{ $lab->name_th }}</h3>
+                        <p>{{ $lab->description_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if($activities->count() > 0)
+    <section class="content-section" style="background-color: #fff">
+        <div class="container">
+            <h2 class="section-title">กิจกรรมเด่นของนักศึกษา</h2>
+            <div class="row g-4">
+                @foreach($activities as $activity)
+                <div class="col-lg-6">
+                    <div class="info-card">
+                        <div class="activity-date">
+                            @if($activity->activity_date)
+                                {{ $activity->activity_date->format('d/m/Y') }}
+                            @else
+                                ไม่ระบุวันที่
+                            @endif
+                        </div>
+                        <h3 class="info-title">{{ $activity->title_th }}</h3>
+                        <p>{{ $activity->description_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if($studentWorks->count() > 0)
+    <section class="content-section">
+        <div class="container">
+            <h2 class="section-title">ผลงานนักศึกษา</h2>
+            <div class="row g-4">
+                @foreach($studentWorks as $work)
+                <div class="col-lg-6">
+                    <div class="info-card">
+                        <h3 class="info-title">{{ $work->title_th }}</h3>
+                        <p>{{ $work->description_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if($alumni->count() > 0)
+    <section class="content-section" style="background-color: #fff">
+        <div class="container">
+            <h2 class="section-title">ศิษย์เก่า</h2>
+            <div class="row g-4">
+                @foreach($alumni as $alumnus)
+                <div class="col-lg-6">
+                    <div class="info-card">
+                        <h3 class="info-title">{{ $alumnus->name_th }}</h3>
+                        @if($alumnus->position_th)
+                        <div class="faculty-position">{{ $alumnus->position_th }}</div>
+                        @endif
+                        @if($alumnus->company_th)
+                        <div><strong>บริษัท:</strong> {{ $alumnus->company_th }}</div>
+                        @endif
+                        <p>{{ $alumnus->biography_th }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
